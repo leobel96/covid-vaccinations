@@ -316,6 +316,7 @@ fetch(
 function processData(data) {
   const COUNTRY_NAME = 0;
   const TOTAL_VACCINES = 3;
+  const PER_HUNDRED = 5;
   const rows = data.split(/\r?\n|\r/);
   let currentCountry = rows[1].split(",")[COUNTRY_NAME];
   let nextCountry = "";
@@ -330,19 +331,20 @@ function processData(data) {
     }
     // Check if it's the last row for that country
     if (lastRowForCountry) {
-      let totalVaccines = cells[TOTAL_VACCINES];
-      addCountry(currentCountry, totalVaccines);
+      const totalVaccines = cells[TOTAL_VACCINES];
+	    const percentage = cells[PER_HUNDRED];
+      addCountry(currentCountry, totalVaccines, percentage);
       currentCountry = nextCountry;
     }
   }
 }
 
-function animateValue(obj, start, end, duration) {
+function animateValue(obj, start, end, duration, percentage) {
   let startTimestamp = null;
   const step = (timestamp) => {
     if (!startTimestamp) startTimestamp = timestamp;
     const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-    obj.innerHTML = Math.floor(progress * (end - start) + start);
+	  obj.innerHTML = `${Math.floor(progress * (end - start) + start)}<br>${percentage}%`;
     if (progress < 1) {
       window.requestAnimationFrame(step);
     }
@@ -350,7 +352,7 @@ function animateValue(obj, start, end, duration) {
   window.requestAnimationFrame(step);
 }
 
-function addCountry(countryName, totalVaccines) {
+function addCountry(countryName, totalVaccines, percentage) {
   let countryFound = false;
   for (countryCode in countries) {
     if (countries[countryCode] == countryName) {
@@ -361,12 +363,12 @@ function addCountry(countryName, totalVaccines) {
       div.className = `country flag-icon-background flag-icon-${countryCode}`;
       document.getElementById("countries").appendChild(div);
       div.appendChild(span);
-      animateValue(span, 0, parseInt(totalVaccines), 2000);
+      animateValue(span, 0, parseInt(totalVaccines), 2000, percentage);
       span.addEventListener("mouseenter", () => {
         span.innerHTML = countryName;
       });
       span.addEventListener("mouseleave", () => {
-        span.innerHTML = totalVaccines;
+        span.innerHTML = `${totalVaccines}<br>${percentage}%`;
       });
       break;
     }
