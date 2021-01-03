@@ -102,6 +102,7 @@ footer {
   }
 
   footer {
+    margin-top: 5vw;
     font-size: 1rem;
   }
 }
