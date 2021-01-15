@@ -307,6 +307,10 @@ const countries = {
   zw: "Zimbabwe",
 };
 
+var COUNTRY_NAME = 0;
+var TOTAL_VACCINES = 3;
+var PER_HUNDRED = 8;
+
 fetch(
   "https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/vaccinations/vaccinations.csv"
 )
@@ -314,9 +318,6 @@ fetch(
   .then((data) => processData(data));
 
 function processData(data) {
-  const COUNTRY_NAME = 0;
-  const TOTAL_VACCINES = 3;
-  const PER_HUNDRED = 5;
   const rows = data.split(/\r?\n|\r/);
   let currentCountry = rows[1].split(",")[COUNTRY_NAME];
   let nextCountry = "";
