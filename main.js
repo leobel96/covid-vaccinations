@@ -262,6 +262,26 @@ function animateValue(obj, start, end, duration, percentage) {
   window.requestAnimationFrame(step);
 }
 
+const options = {
+  root: null,
+  rootMargin: '0px',
+  threshold: 0.1,
+};
+
+const callback = (entries, obs) => {
+  entries.forEach((entry) => {
+    if (entry.isIntersecting) {
+      const elem = entry.target;
+      if (entry.intersectionRatio >= 0.1) {
+        elem.classList.add(elem.getAttribute('flag-class'));
+        obs.unobserve(elem);
+      }
+    }
+  });
+};
+
+const observer = new IntersectionObserver(callback, options);
+
 function processData(data) {
   data.forEach((entry) => {
     if (entry.iso_code in countryISOMapping) {
@@ -270,9 +290,11 @@ function processData(data) {
       const span = document.createElement('span');
       span.className = 'overlay';
       const div = document.createElement('div');
-      div.className = `country flag-icon-background flag-icon-${countryISOMapping[entry.iso_code].toLowerCase()}`;
-      document.getElementById('countries').appendChild(div);
+      div.className = 'country flag-icon-background';
+      div.setAttribute('flag-class', `flag-icon-${countryISOMapping[entry.iso_code].toLowerCase()}`);
       div.appendChild(span);
+      document.getElementById('countries').appendChild(div);
+      observer.observe(div);
       if (newestData.people_fully_vaccinated !== undefined) {
         animateValue(span, 0, newestData.people_fully_vaccinated, 2000, newestData.people_fully_vaccinated_per_hundred);
         span.addEventListener('mouseleave', () => {
