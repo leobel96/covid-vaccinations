@@ -262,6 +262,7 @@ function animateValue(obj, start, end, duration, percentage) {
   window.requestAnimationFrame(step);
 }
 
+// Lazy load the images
 const options = {
   root: null,
   rootMargin: '0px',
@@ -282,6 +283,7 @@ const callback = (entries, obs) => {
 
 const observer = new IntersectionObserver(callback, options);
 
+// Process the data received from OWID
 function processData(data) {
   data.forEach((entry) => {
     if (entry.iso_code in countryISOMapping) {
@@ -292,20 +294,27 @@ function processData(data) {
       const div = document.createElement('div');
       div.className = 'country flag-icon-background';
       div.setAttribute('flag-class', `flag-icon-${countryISOMapping[entry.iso_code].toLowerCase()}`);
+      const fully = newestData.people_fully_vaccinated || 'Not Provided';
+      const fullyPerc = newestData.people_fully_vaccinated_per_hundred || '';
+      const boosters = newestData.total_boosters || 'Not Provided';
+      const boostersPerc = newestData.total_boosters_per_hundred || '';
+
+      // Save these attributes for later
+      div.setAttribute('fully', fully);
+      div.setAttribute('fully-percentage', fullyPerc);
+      div.setAttribute('boosters', boosters);
+      div.setAttribute('boosters-percentage', boostersPerc);
+
       div.appendChild(span);
       document.getElementById('countries').appendChild(div);
       observer.observe(div);
-      if (newestData.people_fully_vaccinated !== undefined) {
-        animateValue(span, 0, newestData.people_fully_vaccinated, 2000, newestData.people_fully_vaccinated_per_hundred);
-        span.addEventListener('mouseleave', () => {
-          span.innerHTML = `${newestData.people_fully_vaccinated}<br>${newestData.people_fully_vaccinated_per_hundred}%`;
-        });
-      } else {
-        span.innerHTML = 'Not Provided';
-        span.addEventListener('mouseleave', () => {
-          span.innerHTML = 'Not Provided';
-        });
+      if (fully !== 'Not Provided') {
+        animateValue(span, 0, fully, 2000, fullyPerc);
       }
+      span.addEventListener('mouseleave', () => {
+        span.innerHTML = `${fully}<br>${fullyPerc}`;
+        if (fullyPerc !== '') span.innerHTML += '%';
+      });
       span.addEventListener('mouseenter', () => {
         span.innerHTML = entry.country;
       });
@@ -318,3 +327,20 @@ fetch(
 )
   .then((response) => response.json())
   .then((data) => processData(data));
+
+const toggle = document.getElementById('toggle');
+toggle.addEventListener('change', (ev) => {
+  const countries = document.getElementsByClassName('country');
+  for (const country of countries) {
+    const valueName = ev.target.checked ? 'boosters' : 'fully';
+    const value = country.getAttribute(valueName);
+    let valuePerc = country.getAttribute(`${valueName}-percentage`);
+    if (valuePerc !== '') valuePerc += '%';
+    const span = country.childNodes[0];
+    span.innerHTML = `${value}<br>${valuePerc}`;
+    span.onmouseleave = null;
+    span.addEventListener('mouseleave', () => {
+      span.innerHTML = `${value}<br>${valuePerc}`;
+    });
+  }
+});

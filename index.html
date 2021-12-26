@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="main.js"></script>
+  <script src="main.js" defer></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icon-css@3.5.0/css/flag-icon.min.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💉</text></svg>">
   <meta name="theme-color" content="#c62828"/>
@@ -28,6 +28,14 @@
 
 <body>
   <h1>People fully vaccinated against COVID-19 💉</h1>
+  <div class="switch-container">
+    <span>Fully<br>vaccinated</span>
+    <label class="switch">
+      <input type="checkbox" id="toggle">
+      <span class="slider round"></span>
+    </label>
+    <span>Boosters&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</span>
+  </div>
   <div id="countries">
   </div>
   <footer>
